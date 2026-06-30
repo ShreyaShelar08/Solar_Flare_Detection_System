@@ -51,22 +51,21 @@ class InferencePipeline:
         self._models["forecast_bilstm"] = self._try_load("forecast_bilstm.h5")
 
     def _try_load(self, filename: str) -> tf.keras.Model | None:
-        """Build model architecture and load weights-only (avoids broken Keras 3 .h5 deserialization)."""
-        weights_filename = filename.replace(".h5", ".weights.h5")
-        weights_path = self.models_dir / weights_filename
-        if not weights_path.exists():
-            logger.warning("Weights file not found: %s — using fallback simulation.", weights_path)
+        """Build model architecture and load weights directly from .h5 (skips broken config deserialization)."""
+        model_path = self.models_dir / filename
+        if not model_path.exists():
+            logger.warning("Model file not found: %s — using fallback simulation.", model_path)
             return None
         try:
             if "nowcast" in filename:
                 model = build_nowcast_model(window_length=60, in_channels=4)
             else:
                 model = build_forecast_model(window_length=120, in_channels=5)
-            model.load_weights(str(weights_path))
-            logger.info("Loaded weights successfully from %s", weights_path)
+            model.load_weights(str(model_path), by_name=True, skip_mismatch=False)
+            logger.info("Loaded weights successfully from %s", model_path)
             return model
         except Exception as exc:
-            logger.error("Failed to load weights from %s: %s", weights_path, exc)
+            logger.error("Failed to load weights from %s: %s", model_path, exc)
             return None
 
     @property
