@@ -17,13 +17,24 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from flask import Flask
 import pandas as pd
 import numpy as np
 import io
-from flask_cors import CORS
-app = Flask(__name__)
-CORS(app, origins=["https://yourproject.tech", "http://localhost:5173"])
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://yourproject.tech",
+        "https://solarflare.yourproject.tech",  # if frontend is on a subdomain
+        "http://localhost:3000",  # Next.js dev server, not 5173 (that's Vite)
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Fix path to import ml models
 import sys
