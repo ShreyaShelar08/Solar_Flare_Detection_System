@@ -17,9 +17,13 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
+from flask import Flask
 import pandas as pd
 import numpy as np
 import io
+from flask_cors import CORS
+app = Flask(__name__)
+CORS(app, origins=["https://yourproject.tech", "http://localhost:5173"])
 
 # Fix path to import ml models
 import sys
