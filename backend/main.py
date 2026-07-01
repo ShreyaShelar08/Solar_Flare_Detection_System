@@ -85,8 +85,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "https://solar-flare-detection-system.vercel.app",
         "https://solar-flare-detection-system-git-main-shreyashelar08s-projects.vercel.app",
-        "https://yourproject.tech",
-        "https://solarflare.yourproject.tech",
+        "https://solarflaredetectionsystem.shreyashelar.tech",
+        
     ],
     allow_credentials=True,
     allow_methods=["*"],
