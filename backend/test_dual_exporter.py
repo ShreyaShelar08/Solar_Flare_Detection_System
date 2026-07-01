@@ -50,7 +50,7 @@ def test_dual_exporter():
     ready = False
     for _ in range(20):
         try:
-            r = requests.get("http://127.0.0.1:8000/health", timeout=1)
+            r = requests.get("${process.env.NEXT_PUBLIC_API_URL}/health", timeout=1)
             if r.status_code == 200:
                 ready = True
                 break
@@ -71,7 +71,7 @@ def test_dual_exporter():
                 "file_solexs": fs,
                 "file_helios": fh
             }
-            resp = requests.post("http://127.0.0.1:8000/preprocess-and-clean", files=files, timeout=10)
+            resp = requests.post("${process.env.NEXT_PUBLIC_API_URL}/preprocess-and-clean", files=files, timeout=10)
             
         if resp.status_code == 200:
             res = resp.json()
@@ -84,7 +84,7 @@ def test_dual_exporter():
             print(f"HTTP Upload Error: {resp.status_code} - {resp.text}")
             
         # 4. Check Nowcast Download
-        r_nowcast = requests.get("http://127.0.0.1:8000/download/nowcast", timeout=5)
+        r_nowcast = requests.get("${process.env.NEXT_PUBLIC_API_URL}/download/nowcast", timeout=5)
         if r_nowcast.status_code == 200:
             df_n = pd.read_csv(io.StringIO(r_nowcast.text))
             print(f"Nowcast File Columns: {df_n.columns.tolist()}")

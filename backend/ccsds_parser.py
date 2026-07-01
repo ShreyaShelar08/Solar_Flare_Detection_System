@@ -18,7 +18,7 @@ APID_HEL1OS_HXR = 101
 # UDP Listening Port for raw ground station receiver downlink
 UDP_IP = "127.0.0.1"
 UDP_PORT = 9000
-API_URL = "http://127.0.0.1:8000/predict/live"
+API_URL = "${process.env.NEXT_PUBLIC_API_URL}/predict/live"
 
 def parse_ccsds_header(header_bytes: bytes) -> tuple[int, int, int]:
     """

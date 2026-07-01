@@ -51,7 +51,7 @@ export interface SolarAlert {
 }
 
 const WS_URL = "ws://127.0.0.1:8000/ws/simulation";
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "${process.env.NEXT_PUBLIC_API_URL}";
 
 interface TelemetryContextType {
   // 1-by-1 manual ingestion points

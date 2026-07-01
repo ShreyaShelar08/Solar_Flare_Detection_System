@@ -40,7 +40,7 @@ export default function Home() {
     setErrorMsg("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/predict/live", {
+      const response = await fetch("${process.env.NEXT_PUBLIC_API_URL}/predict/live", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sxr_raw: sxr, hxr_raw: hxr }),
@@ -314,14 +314,14 @@ export default function Home() {
               
               <div className="flex flex-col gap-2 mt-2">
                 <a
-                  href="http://127.0.0.1:8000/download/live/solexs"
+                  href="${process.env.NEXT_PUBLIC_API_URL}/download/live/solexs"
                   className="flex items-center justify-center gap-2 bg-[#1f2937] hover:bg-[#374151] border border-[var(--border-accent)] text-white text-xs font-semibold py-2 rounded-lg uppercase tracking-wider transition-all"
                 >
                   <Download className="w-4 h-4" />
                   SoLEXS Cleaned CSV
                 </a>
                 <a
-                  href="http://127.0.0.1:8000/download/live/helios"
+                  href="${process.env.NEXT_PUBLIC_API_URL}/download/live/helios"
                   className="flex items-center justify-center gap-2 bg-[#1f2937] hover:bg-[#374151] border border-[var(--border-accent)] text-white text-xs font-semibold py-2 rounded-lg uppercase tracking-wider transition-all"
                 >
                   <Download className="w-4 h-4" />

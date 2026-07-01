@@ -80,7 +80,7 @@ Solar_Flare_Detection_System/
    ```bash
    uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
    ```
-   *The API will be available at `http://127.0.0.1:8000` (docs at `/docs`).*
+   *The API will be available at `${process.env.NEXT_PUBLIC_API_URL}` (docs at `/docs`).*
 
 ---
 

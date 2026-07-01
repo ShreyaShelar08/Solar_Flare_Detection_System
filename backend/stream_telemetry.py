@@ -36,7 +36,7 @@ def stream_telemetry(csv_path: str, speed_multiplier: float):
         
     total_points = len(df)
     print(f"Loaded {total_points} rows. Starting live transmission stream...")
-    print(f"API Target: http://127.0.0.1:8000/predict/live")
+    print(f"API Target: ${process.env.NEXT_PUBLIC_API_URL}/predict/live")
     print(f"Speed Multiplier: {speed_multiplier}x (Delay: {1.0 / speed_multiplier:.2f}s per tick)")
     print("-" * 70)
     print(f"{'Tick':<6} | {'SXR Raw':<8} | {'HXR Raw':<8} | {'Nowcast Prob':<14} | {'Forecast Class':<14} | {'Alert Level':<12}")
@@ -56,7 +56,7 @@ def stream_telemetry(csv_path: str, speed_multiplier: float):
             }
             
             try:
-                resp = requests.post("http://127.0.0.1:8000/predict/live", json=payload, timeout=2)
+                resp = requests.post("${process.env.NEXT_PUBLIC_API_URL}/predict/live", json=payload, timeout=2)
                 if resp.status_code == 200:
                     res = resp.json()
                     tick = res.get("tickCount", idx + 1)

@@ -90,7 +90,7 @@ export default function DataExporter() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/preprocess-and-clean", {
+      const response = await fetch("${process.env.NEXT_PUBLIC_API_URL}/preprocess-and-clean", {
         method: "POST",
         body: formData,
       });
@@ -129,7 +129,7 @@ export default function DataExporter() {
     setLiveError("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/predict/live", {
+      const response = await fetch("${process.env.NEXT_PUBLIC_API_URL}/predict/live", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sxr_raw: sxrNum, hxr_raw: hxrNum }),
@@ -232,14 +232,14 @@ export default function DataExporter() {
             <div className="border-t border-[var(--border-subtle)] pt-4 mt-2 flex flex-col gap-2">
               <span className="text-[10px] uppercase text-[var(--text-muted)] tracking-wider font-semibold">Download Live Logs</span>
               <a
-                href="http://127.0.0.1:8000/download/live/solexs"
+                href="${process.env.NEXT_PUBLIC_API_URL}/download/live/solexs"
                 className="flex items-center justify-center gap-2 bg-[#1f2937] hover:bg-[#374151] border border-[var(--border-accent)] text-white text-[11px] font-semibold py-1.5 rounded-lg uppercase tracking-wider transition-all"
               >
                 <FileDown className="w-3.5 h-3.5" />
                 Download Live SoLEXS CSV
               </a>
               <a
-                href="http://127.0.0.1:8000/download/live/helios"
+                href="${process.env.NEXT_PUBLIC_API_URL}/download/live/helios"
                 className="flex items-center justify-center gap-2 bg-[#1f2937] hover:bg-[#374151] border border-[var(--border-accent)] text-white text-[11px] font-semibold py-1.5 rounded-lg uppercase tracking-wider transition-all"
               >
                 <FileDown className="w-3.5 h-3.5" />
