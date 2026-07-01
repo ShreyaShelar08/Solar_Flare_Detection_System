@@ -107,7 +107,7 @@ Solar_Flare_Detection_System/
 ## 📋 Data Formats
 
 ### REST Endpoints
-*   **`POST /predict/live`**: Ingests a single telemetry point `{"sxr_raw": float, "hxr_raw": float}` and returns denoised counts, alert levels, nowcast probabilities, and active forecasts.
+*   **`POST /predict/live`**: Ingests a single telemetry point `{`sxr_raw": float, "hxr_raw": float}` and returns denoised counts, alert levels, nowcast probabilities, and active forecasts.
 *   **`POST /preprocess-and-clean`**: Uploads bulk telemetry CSV files, aligns timestamps, runs inference, and generates downloadable datasets.
 
 ### WebSocket (`ws://127.0.0.1:8000/ws/simulation`)

@@ -356,8 +356,8 @@ async def preprocess_and_clean_endpoint(
         "total_rows_1s": len(df),
         "total_rows_1m": len(df_1m),
         "detected_flares": detected_flares,
-        "download_nowcast_url": "${process.env.NEXT_PUBLIC_API_URL}/download/nowcast",
-        "download_forecast_url": "${process.env.NEXT_PUBLIC_API_URL}/download/forecast",
+        "download_nowcast_url": `${process.env.NEXT_PUBLIC_API_URL}/download/nowcast`,
+        "download_forecast_url": `${process.env.NEXT_PUBLIC_API_URL}/download/forecast`,
         "preview_data": preview_data
     }
 
@@ -905,7 +905,7 @@ def _run_simulation_thread(loop: asyncio.AbstractEventLoop) -> None:
         tick += 1
         try:
             resp = _req.post(
-                "${process.env.NEXT_PUBLIC_API_URL}/predict/live",
+                `${process.env.NEXT_PUBLIC_API_URL}/predict/live`,
                 json={"sxr_raw": round(sxr, 3), "hxr_raw": round(hxr, 3)},
                 timeout=3,
             )

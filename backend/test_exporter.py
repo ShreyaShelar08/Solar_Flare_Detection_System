@@ -44,7 +44,7 @@ def test_exporter():
     ready = False
     for _ in range(20):
         try:
-            r = requests.get("${process.env.NEXT_PUBLIC_API_URL}/health", timeout=1)
+            r = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/health`, timeout=1)
             if r.status_code == 200:
                 ready = True
                 break
@@ -61,7 +61,7 @@ def test_exporter():
         # 3. Call POST /preprocess-and-clean
         print("Uploading dummy CSV to /preprocess-and-clean...")
         with open(test_csv_path, "rb") as f:
-            resp = requests.post("${process.env.NEXT_PUBLIC_API_URL}/preprocess-and-clean", files={"file": f}, timeout=10)
+            resp = requests.post(`${process.env.NEXT_PUBLIC_API_URL}/preprocess-and-clean`, files={"file": f}, timeout=10)
             
         if resp.status_code == 200:
             res_data = resp.json()
@@ -78,7 +78,7 @@ def test_exporter():
             
         # 4. Test Downloads
         print("\nTesting /download/nowcast endpoint...")
-        r_nowcast = requests.get("${process.env.NEXT_PUBLIC_API_URL}/download/nowcast", timeout=5)
+        r_nowcast = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/download/nowcast`, timeout=5)
         if r_nowcast.status_code == 200:
             print("Download Nowcast CSV: PASS")
             # Print columns of the downloaded file
@@ -89,7 +89,7 @@ def test_exporter():
             print(f"Download Nowcast CSV: FAIL ({r_nowcast.status_code})")
             
         print("\nTesting /download/forecast endpoint...")
-        r_forecast = requests.get("${process.env.NEXT_PUBLIC_API_URL}/download/forecast", timeout=5)
+        r_forecast = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/download/forecast`, timeout=5)
         if r_forecast.status_code == 200:
             print("Download Forecast CSV: PASS")
             df_f = pd.read_csv(io.StringIO(r_forecast.text))

@@ -40,7 +40,7 @@ def run_tests() -> dict[str, Any]:
         if server_process.poll() is not None:
             break
         try:
-            resp = requests.get("${process.env.NEXT_PUBLIC_API_URL}/health", timeout=1)
+            resp = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/health`, timeout=1)
             if resp.status_code == 200:
                 started = True
                 break
@@ -70,7 +70,7 @@ def run_tests() -> dict[str, Any]:
     # 2. Test /health REST endpoint
     try:
         print("Testing /health endpoint...")
-        resp = requests.get("${process.env.NEXT_PUBLIC_API_URL}/health", timeout=3)
+        resp = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/health`, timeout=3)
         if resp.status_code == 200:
             data = resp.json()
             print(f"Health Response: {data}")

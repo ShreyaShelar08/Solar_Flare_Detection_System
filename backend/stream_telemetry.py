@@ -56,7 +56,7 @@ def stream_telemetry(csv_path: str, speed_multiplier: float):
             }
             
             try:
-                resp = requests.post("${process.env.NEXT_PUBLIC_API_URL}/predict/live", json=payload, timeout=2)
+                resp = requests.post(`${process.env.NEXT_PUBLIC_API_URL}/predict/live`, json=payload, timeout=2)
                 if resp.status_code == 200:
                     res = resp.json()
                     tick = res.get("tickCount", idx + 1)

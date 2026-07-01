@@ -37,7 +37,7 @@ def run_realtime_test():
     ready = False
     for _ in range(20):
         try:
-            r = requests.get("${process.env.NEXT_PUBLIC_API_URL}/health", timeout=1)
+            r = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/health`, timeout=1)
             if r.status_code == 200:
                 ready = True
                 break
