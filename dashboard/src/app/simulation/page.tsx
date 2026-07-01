@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HeaderBar from "@/components/HeaderBar";
 import { useTelemetry, SimPoint } from "@/context/TelemetryContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -107,7 +107,11 @@ function KpiCard({ label, value, sub, icon, valueColor, bar }: {
 
 /* ── Simulation Page ────────────────────────────────────── */
 export default function SimulationPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const { theme } = useTheme();
+  
+  useEffect(() => { setIsMounted(true); }, []);
+  if (!isMounted) return null;
   
   // Consume everything from global context to keep it working across tab switches!
   const {
