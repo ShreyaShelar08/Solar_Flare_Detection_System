@@ -67,7 +67,7 @@ def test_live_processing():
                 
         # 3. Test Live Downloads
         print("\nTesting SoLEXS live download...")
-        r_solexs = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/download/live/solexs`, timeout=5)
+        r_solexs = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/download/live/solexs`}, timeout=5)
         if r_solexs.status_code == 200:
             print("Download SoLEXS Live CSV: PASS")
             df_s = pd.read_csv(io.StringIO(r_solexs.text))
@@ -77,7 +77,7 @@ def test_live_processing():
             print(f"Download SoLEXS Live CSV: FAIL ({r_solexs.status_code})")
             
         print("\nTesting HEL1OS live download...")
-        r_helios = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/download/live/helios`, timeout=5)
+        r_helios = requests.get(`${process.env.NEXT_PUBLIC_API_URL}/download/live/helios`}, timeout=5)
         if r_helios.status_code == 200:
             print("Download HEL1OS Live CSV: PASS")
             df_h = pd.read_csv(io.StringIO(r_helios.text))
