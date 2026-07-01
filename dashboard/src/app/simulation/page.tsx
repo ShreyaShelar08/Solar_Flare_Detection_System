@@ -111,7 +111,13 @@ export default function SimulationPage() {
   const { theme } = useTheme();
   
   useEffect(() => { setIsMounted(true); }, []);
-  
+  if (!isMounted) return (
+  <div className="flex flex-col min-h-screen" style={{ background: "var(--bg-primary)" }}>
+    <div className="flex-1 flex items-center justify-center">
+      <span style={{ color: "var(--text-muted)" }}>Loading simulation...</span>
+    </div>
+  </div>
+);
   
   // Consume everything from global context to keep it working across tab switches!
   const {
