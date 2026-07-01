@@ -50,7 +50,7 @@ export interface SolarAlert {
   message: string;
 }
 
-const WS_URL = "ws://127.0.0.1:8000/ws/simulation";
+const WS_URL = "wss://solar-flare-detection-system.onrender.com/ws/simulation";
 const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 interface TelemetryContextType {

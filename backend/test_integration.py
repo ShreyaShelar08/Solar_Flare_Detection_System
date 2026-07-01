@@ -105,7 +105,7 @@ def run_tests() -> dict[str, Any]:
     # 3. Test WebSocket Telemetry Stream
     try:
         print("Testing WebSocket telemetry stream...")
-        ws = websocket.create_connection("ws://127.0.0.1:8000/ws/telemetry")
+        ws = websocket.create_connection("wss://solar-flare-detection-system.onrender.com/ws/telemetry")
         
         # Connect and read 3 data packets
         packets = []

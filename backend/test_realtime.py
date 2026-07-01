@@ -53,7 +53,7 @@ def run_realtime_test():
     print("Server is active. Initiating telemetry stream...")
     
     # 2. Connect to the WebSocket telemetry endpoint
-    ws = websocket.create_connection("ws://127.0.0.1:8000/ws/telemetry")
+    ws = websocket.create_connection("wss://solar-flare-detection-system.onrender.com/ws/telemetry")
     
     # Tell server to pause mock generation so we can feed our own inputs if needed,
     # or we can read the live stream and check the transitions as we inject a simulated flare sequence.

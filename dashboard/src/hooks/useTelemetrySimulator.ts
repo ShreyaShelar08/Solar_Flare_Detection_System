@@ -43,7 +43,7 @@ const SPIKE_INTERVAL_MIN = 40;
 const SPIKE_INTERVAL_MAX = 80;
 const THERMAL_RAMP_DURATION = 30; // ticks
 const CRITICAL_THRESHOLD = 0.80;
-const BACKEND_WS_URL = "ws://127.0.0.1:8000/ws/telemetry";
+const BACKEND_WS_URL = "wss://solar-flare-detection-system.onrender.com/ws/telemetry";
 
 /* ── Helpers ────────────────────────────────────────────── */
 function gaussianRandom(mean = 0, std = 1): number {
