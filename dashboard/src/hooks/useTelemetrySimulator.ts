@@ -34,14 +34,15 @@ export interface TelemetryState {
   lastUpdate: string;
   toggle: () => void;
   isBackendConnected: boolean;
+  mounted: boolean;
 }
 
 /* ── Constants ──────────────────────────────────────────── */
 const WINDOW_SIZE = 80;
-const TICK_INTERVAL = 1000; // ms
+const TICK_INTERVAL = 1000;
 const SPIKE_INTERVAL_MIN = 40;
 const SPIKE_INTERVAL_MAX = 80;
-const THERMAL_RAMP_DURATION = 30; // ticks
+const THERMAL_RAMP_DURATION = 30;
 const CRITICAL_THRESHOLD = 0.80;
 const BACKEND_WS_URL = "wss://solar-flare-detection-system.onrender.com/ws/telemetry";
 
@@ -96,6 +97,7 @@ function getTimeToPeak(sxrMean: number): string {
 
 /* ── Hook ───────────────────────────────────────────────── */
 export function useTelemetrySimulator(): TelemetryState {
+  const [mounted, setMounted] = useState(false);
   const [data, setData] = useState<TelemetryPoint[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [nowcastProb, setNowcastProb] = useState(0);
@@ -110,32 +112,33 @@ export function useTelemetrySimulator(): TelemetryState {
   const [lastUpdate, setLastUpdate] = useState("--:--:--");
   const [isBackendConnected, setIsBackendConnected] = useState(false);
 
-  // Mutable refs for simulation state
   const tickRef = useRef(0);
-  const nextSpikeRef = useRef(
-    Math.floor(Math.random() * (SPIKE_INTERVAL_MAX - SPIKE_INTERVAL_MIN) + SPIKE_INTERVAL_MIN)
-  );
+  const nextSpikeRef = useRef(0);
   const prevHxrRef = useRef(2);
   const thermalRampRef = useRef(0);
   const thermalActiveRef = useRef(false);
   const sxrRollingRef = useRef<number[]>([]);
   const hxrRollingRef = useRef<number[]>([]);
   const decayProbRef = useRef(0);
-
-  // WebSocket ref
   const wsRef = useRef<WebSocket | null>(null);
+
+  // Set mounted on client only — this is the hydration fix
+  useEffect(() => {
+    nextSpikeRef.current = Math.floor(
+      Math.random() * (SPIKE_INTERVAL_MAX - SPIKE_INTERVAL_MIN) + SPIKE_INTERVAL_MIN
+    );
+    setMounted(true);
+  }, []);
 
   const toggle = useCallback(() => {
     setIsRunning((prev) => !prev);
   }, []);
 
-  // Handle telemetry updates from either source
   const handleTick = useCallback((point: TelemetryPoint) => {
     setData((prev) => {
       const next = [...prev, point];
       return next.length > WINDOW_SIZE ? next.slice(-WINDOW_SIZE) : next;
     });
-
     setNowcastProb(point.nowcastProb);
     setForecastData({
       predictedClass: point.forecastClass,
@@ -148,7 +151,7 @@ export function useTelemetrySimulator(): TelemetryState {
   }, []);
 
   useEffect(() => {
-    if (!isRunning) {
+    if (!mounted || !isRunning) {
       if (wsRef.current) {
         wsRef.current.close();
         wsRef.current = null;
@@ -157,7 +160,6 @@ export function useTelemetrySimulator(): TelemetryState {
       return;
     }
 
-    // Try starting WebSocket connection to FastAPI
     console.log("Connecting to Aditya-L1 Telemetry WebSocket:", BACKEND_WS_URL);
     const ws = new WebSocket(BACKEND_WS_URL);
     wsRef.current = ws;
@@ -172,7 +174,6 @@ export function useTelemetrySimulator(): TelemetryState {
     ws.onmessage = (event) => {
       try {
         const point = JSON.parse(event.data);
-        // Map keys if necessary, the backend matches this schema
         const mappedPoint: TelemetryPoint = {
           time: point.time,
           timestamp: point.timestamp,
@@ -193,9 +194,8 @@ export function useTelemetrySimulator(): TelemetryState {
       }
     };
 
-    // If socket connection fails or closes, fall back to local simulation
     const startLocalFallback = () => {
-      if (localInterval) return; // already running
+      if (localInterval) return;
       console.log("Starting client-side telemetry simulation fallback.");
       setIsBackendConnected(false);
 
@@ -205,10 +205,8 @@ export function useTelemetrySimulator(): TelemetryState {
         const now = new Date();
         const timeStr = formatUTC(now);
 
-        /* ── SXR (SoLEXS) ─── Slow thermal sine wave ────────── */
         let sxrBase = 5 + 2.5 * Math.sin(t * 0.05) + 0.8 * Math.sin(t * 0.02 + 1.5);
 
-        // Occasional thermal ramp
         if (!thermalActiveRef.current && Math.random() < 0.008) {
           thermalActiveRef.current = true;
           thermalRampRef.current = 0;
@@ -225,7 +223,6 @@ export function useTelemetrySimulator(): TelemetryState {
 
         const sxr = Math.max(0, sxrBase + gaussianRandom(0, 0.4));
 
-        /* ── HXR (HEL1OS) ─── Flat baseline + impulsive spikes ─ */
         let hxrBase = 2 + Math.abs(gaussianRandom(0, 1.2));
         let isSpike = false;
 
@@ -234,16 +231,11 @@ export function useTelemetrySimulator(): TelemetryState {
           hxrBase = spikeAmplitude;
           isSpike = true;
           nextSpikeRef.current =
-            t +
-            Math.floor(
-              Math.random() * (SPIKE_INTERVAL_MAX - SPIKE_INTERVAL_MIN) +
-                SPIKE_INTERVAL_MIN
-            );
+            t + Math.floor(Math.random() * (SPIKE_INTERVAL_MAX - SPIKE_INTERVAL_MIN) + SPIKE_INTERVAL_MIN);
         }
 
         const hxr = Math.max(0, hxrBase);
 
-        /* ── Rolling Means ─────────────────────────────────────── */
         sxrRollingRef.current.push(sxr);
         hxrRollingRef.current.push(hxr);
         if (sxrRollingRef.current.length > 16) sxrRollingRef.current.shift();
@@ -252,7 +244,6 @@ export function useTelemetrySimulator(): TelemetryState {
         const sxrMean = sxrRollingRef.current.reduce((a, b) => a + b, 0) / sxrRollingRef.current.length;
         const hxrMean = hxrRollingRef.current.reduce((a, b) => a + b, 0) / hxrRollingRef.current.length;
 
-        /* ── Nowcast Probability ─── Derivative-based ──────────── */
         const derivative = Math.abs(hxr - prevHxrRef.current);
         prevHxrRef.current = hxr;
 
@@ -267,12 +258,10 @@ export function useTelemetrySimulator(): TelemetryState {
         }
         prob = Math.min(prob, 0.99);
 
-        /* ── Forecast ─── Based on SXR thermal state ───────────── */
         const { cls } = getFlareClass(sxrMean);
         const timeToPeak = getTimeToPeak(sxrMean);
         const confidence = sxrMean > 7 ? 0.7 + Math.random() * 0.25 : 0.1 + Math.random() * 0.3;
 
-        /* ── Alert Level ─────────────────────────────────────────── */
         let alert: "normal" | "elevated" | "critical" = "normal";
         if (prob >= CRITICAL_THRESHOLD) {
           alert = "critical";
@@ -300,7 +289,7 @@ export function useTelemetrySimulator(): TelemetryState {
     };
 
     ws.onerror = () => {
-      console.warn("WebSocket error encountered. Falling back to local simulation.");
+      console.warn("WebSocket error. Falling back to local simulation.");
       startLocalFallback();
     };
 
@@ -317,7 +306,7 @@ export function useTelemetrySimulator(): TelemetryState {
         clearInterval(localInterval);
       }
     };
-  }, [isRunning, handleTick]);
+  }, [mounted, isRunning, handleTick]);
 
   return {
     data,
@@ -329,5 +318,6 @@ export function useTelemetrySimulator(): TelemetryState {
     lastUpdate,
     toggle,
     isBackendConnected,
+    mounted,
   };
 }

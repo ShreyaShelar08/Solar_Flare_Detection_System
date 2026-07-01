@@ -39,7 +39,8 @@ interface PreviewPoint {
 import { useTelemetry } from "@/context/TelemetryContext";
 
 export default function DataExporter() {
-  const { isRunning, isBackendConnected, alertLevel } = useTelemetrySimulator();
+  const { data, isRunning, alertLevel, isBackendConnected, mounted } = useTelemetrySimulator();;
+  if (!mounted) return null;
   const { theme } = useTheme();
 
   // Theme-aware chart colors
