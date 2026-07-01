@@ -107,19 +107,10 @@ function KpiCard({ label, value, sub, icon, valueColor, bar }: {
 
 /* ── Simulation Page ────────────────────────────────────── */
 export default function SimulationPage() {
+  // ── ALL HOOKS FIRST — none of these may be skipped on any render ──
   const [isMounted, setIsMounted] = useState(false);
   const { theme } = useTheme();
-  
-  useEffect(() => { setIsMounted(true); }, []);
-  if (!isMounted) return (
-  <div className="flex flex-col min-h-screen" style={{ background: "var(--bg-primary)" }}>
-    <div className="flex-1 flex items-center justify-center">
-      <span style={{ color: "var(--text-muted)" }}>Loading simulation...</span>
-    </div>
-  </div>
-);
-  
-  // Consume everything from global context to keep it working across tab switches!
+
   const {
     simPoints,
     isSimRunning,
@@ -143,6 +134,19 @@ export default function SimulationPage() {
   const [zoomLevel, setZoomLevel] = useState(50); // visible data window size (10 to 300)
   const [scrollOffset, setScrollOffset] = useState(0); // pan offset from latest (0 = latest)
 
+  useEffect(() => { setIsMounted(true); }, []);
+
+  // ── Early return happens AFTER every hook above has run ──
+  if (!isMounted) {
+    return (
+      <div className="flex flex-col min-h-screen" style={{ background: "var(--bg-primary)" }}>
+        <div className="flex-1 flex items-center justify-center">
+          <span style={{ color: "var(--text-muted)" }}>Loading simulation...</span>
+        </div>
+      </div>
+    );
+  }
+
   const chartPoints = simPoints.slice(-WINDOW_SIZE);
   const latest      = simPoints[simPoints.length - 1];
   const alert       = alertColors[latest?.alertLevel ?? "normal"] ?? alertColors.normal;
@@ -151,17 +155,17 @@ export default function SimulationPage() {
   // Get sliced data points for the expanded modal chart based on zoom and scroll panning
   const getModalChartData = () => {
     if (simPoints.length === 0) return [];
-    
+
     // Bounds check on zoomLevel
     const visibleCount = Math.min(simPoints.length, zoomLevel);
-    
+
     // Bounds check on scrollOffset (0 means latest packets, maxOffset means oldest packets)
     const maxOffset = Math.max(0, simPoints.length - visibleCount);
     const offset = Math.min(scrollOffset, maxOffset);
-    
+
     const startIdx = Math.max(0, simPoints.length - visibleCount - offset);
     const endIdx = simPoints.length - offset;
-    
+
     return simPoints.slice(startIdx, endIdx);
   };
   const modalChartData = getModalChartData();
@@ -199,7 +203,7 @@ export default function SimulationPage() {
       p.tickCount, p.sxr_raw, p.hxr_raw, p.sxr_clean, p.hxr_clean, p.nowcastProb, p.forecastClass, p.forecastProb, p.forecastTimeToPeak, p.alertLevel
     ]);
     const csvContent = [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-    
+
     // Create blob to avoid URI length and encoding limitations
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -222,14 +226,14 @@ export default function SimulationPage() {
         <YAxis stroke={axisColor} fontSize={8} label={{ value: "FLUX (W/m²)", angle: -90, position: "insideLeft", fontSize: 7, fill: axisColor, dx: -2 }} />
         <Tooltip contentStyle={tooltipStyle} formatter={(val) => [typeof val === "number" ? val.toFixed(2) : val]} />
         <Legend wrapperStyle={{ fontSize: 9 }} />
-        
+
         {(!isModal || showClean) && (
           <Line type="monotone" dataKey="sxr_clean" stroke="#f97316" name="SXR Clean" strokeWidth={isModal ? 3 : 2.5} dot={{ r: isModal ? 4 : 3, fill: "#f97316" }} isAnimationActive={false} />
         )}
         {(!isModal || showClean) && (
           <Line type="monotone" dataKey="hxr_clean" stroke="#0ea5e9" name="HXR Clean" strokeWidth={isModal ? 2.5 : 2} dot={{ r: isModal ? 4 : 3, fill: "#0ea5e9" }} isAnimationActive={false} />
         )}
-        
+
         {isModal && showRaw && (
           <Line type="monotone" dataKey="sxr_raw" stroke="#ea580c" name="SXR Raw (Noisy)" strokeDasharray="3 3" strokeWidth={1} dot={false} isAnimationActive={false} />
         )}
@@ -255,15 +259,15 @@ export default function SimulationPage() {
           label={{ value: "PROBABILITY (%)", angle: -90, position: "insideLeft", fontSize: 7, fill: axisColor, dx: -2 }}
           tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} />
         <Tooltip contentStyle={tooltipStyle} formatter={(val) => [typeof val === "number" ? `${(val*100).toFixed(1)}%` : val, "Nowcast"]} />
-        
-        <ReferenceLine y={nowcastThreshold} stroke="#f59e0b" strokeDasharray="5 3" 
+
+        <ReferenceLine y={nowcastThreshold} stroke="#f59e0b" strokeDasharray="5 3"
           label={{ value: `Alert Threshold (${(nowcastThreshold * 100).toFixed(0)}%)`, fill: "#f59e0b", fontSize: 8, position: "insideTopLeft" }} />
-        
+
         {isModal && (
-          <ReferenceLine y={0.80} stroke="#ef4444" strokeDasharray="5 3" 
+          <ReferenceLine y={0.80} stroke="#ef4444" strokeDasharray="5 3"
             label={{ value: "Critical Threshold (80%)", fill: "#ef4444", fontSize: 8, position: "insideTopLeft" }} />
         )}
-        
+
         <Area type="monotone" dataKey="nowcastProb" stroke="#ef4444" fill="url(#ng)" strokeWidth={2.5} dot={{ r: isModal ? 4 : 3, fill: "#ef4444" }} isAnimationActive={false} name="Nowcast %" />
       </AreaChart>
     </ResponsiveContainer>
@@ -287,10 +291,10 @@ export default function SimulationPage() {
           tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
         />
         <Tooltip contentStyle={tooltipStyle} formatter={(val) => [typeof val === "number" ? `${(val*100).toFixed(1)}%` : val, "Forecast M+X"]} />
-        
-        <ReferenceLine y={forecastThreshold} stroke="#f59e0b" strokeDasharray="5 3" 
+
+        <ReferenceLine y={forecastThreshold} stroke="#f59e0b" strokeDasharray="5 3"
           label={{ value: `Elevated Threshold (${(forecastThreshold * 100).toFixed(0)}%)`, fill: "#f59e0b", fontSize: 8, position: "insideTopLeft" }} />
-        
+
         <Area type="monotone" dataKey="forecastProb" stroke="#f97316" fill="url(#fg)" strokeWidth={2.5} dot={{ r: isModal ? 4 : 3, fill: "#f97316" }} isAnimationActive={false} name="Forecast M+X" />
       </AreaChart>
     </ResponsiveContainer>
@@ -327,7 +331,7 @@ export default function SimulationPage() {
 
             {/* Sidebar Tools Panel — scrollable to prevent Export Button cutoff */}
             <div className="w-full lg:w-72 flex flex-col gap-4 flex-shrink-0 max-h-full overflow-y-auto pr-1 pb-6">
-              
+
               {/* Tool 0: Zoom & Pan Scroll Controls */}
               <div className="glass-card p-4 rounded-xl border border-[var(--border-subtle)] flex flex-col gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
@@ -337,7 +341,7 @@ export default function SimulationPage() {
                 <p className="text-[9px] text-[var(--text-muted)] leading-relaxed">
                   Scale and scroll the horizontal time axis of the dataset.
                 </p>
-                
+
                 {/* Zoom input range */}
                 <div className="mt-2 flex flex-col gap-1">
                   <span className="text-[8px] uppercase text-[var(--text-muted)] block font-semibold">Graph Zoom (Visible window size)</span>
