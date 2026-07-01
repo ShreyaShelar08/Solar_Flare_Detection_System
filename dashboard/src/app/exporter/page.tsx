@@ -232,14 +232,14 @@ export default function DataExporter() {
             <div className="border-t border-[var(--border-subtle)] pt-4 mt-2 flex flex-col gap-2">
               <span className="text-[10px] uppercase text-[var(--text-muted)] tracking-wider font-semibold">Download Live Logs</span>
               <a
-                href=`${process.env.NEXT_PUBLIC_API_URL}/download/live/solexs`
+                href={`${process.env.NEXT_PUBLIC_API_URL}/download/live/solexs`
                 className="flex items-center justify-center gap-2 bg-[#1f2937] hover:bg-[#374151] border border-[var(--border-accent)] text-white text-[11px] font-semibold py-1.5 rounded-lg uppercase tracking-wider transition-all"
               >
                 <FileDown className="w-3.5 h-3.5" />
                 Download Live SoLEXS CSV
               </a>
               <a
-                href=`${process.env.NEXT_PUBLIC_API_URL}/download/live/helios`
+                href={`${process.env.NEXT_PUBLIC_API_URL}/download/live/helios`
                 className="flex items-center justify-center gap-2 bg-[#1f2937] hover:bg-[#374151] border border-[var(--border-accent)] text-white text-[11px] font-semibold py-1.5 rounded-lg uppercase tracking-wider transition-all"
               >
                 <FileDown className="w-3.5 h-3.5" />
