@@ -111,7 +111,7 @@ export default function SimulationPage() {
   const { theme } = useTheme();
   
   useEffect(() => { setIsMounted(true); }, []);
-  if (!isMounted) return null;
+  
   
   // Consume everything from global context to keep it working across tab switches!
   const {
